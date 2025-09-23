@@ -147,13 +147,19 @@ func generarEventos() {
 func generarTablero() [constCantFilasTablero][constCantColumnasTablero]string {
 	var tablero [constCantFilasTablero][constCantColumnasTablero]string
 
-	//PROGRAMAR
-
+	for y := 0; y < constCantFilasTablero; y++ {
+		if y == 0 || y == constCantFilasTablero-1 {
+			for x := 0; x < constCantColumnasTablero; x++ {
+				tablero[y][x] = constSimboloBorde
+			}
+	}
+	
 	return tablero
 }
 
 func inicializarNave(cantFilasTablero int, cantColumnasTablero int) ([constCantColumnas]int, [constCantColumnas]int) {
-	//PROGRAMAR
+	
+	//Programar
 
 	return [constCantColumnas]int{}, quieto
 }
@@ -163,11 +169,8 @@ func inicializarOvnis(cantFilasTablero int, cantColumnasTablero int) [][constCan
 		ovnis [][constCantColumnasOvni]int
 	)
 
-	//PROGRAMAR
-
 	return ovnis
 }
-
 func actualizarTablero(tablero *[constCantFilasTablero][constCantColumnasTablero]string,
 	nave [constCantColumnas]int,
 	disparosNave [][constCantColumnas]int,
