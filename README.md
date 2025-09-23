@@ -18,3 +18,6 @@ B-6 Programación de la función “calcularNuevasPosicionesDisparos”
 B-7 Programación de la función “verificarEstadoDeJuego”
 
 P-1 Agregar una personalización lógica / funcional al juego (no estética), como por ejemplo, movimientos diferentes de los ovnis, nuevos obstáculos en la pantalla, diferentes tipos de disparos, obtener vidas extras, escudos protectores, etc. La personalización agregar debe estar aprobada previamente por los profesores.
+
+
+para los que tengan problema     go install github.com/go-delve/delve/cmd/dlv@latest
