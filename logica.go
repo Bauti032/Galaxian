@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	constCantFilasTablero    = 25
-	constCantColumnasTablero = 29
+	constCantFilasTablero    = 30
+	constCantColumnasTablero = 30
 
 	constCantColumnas = 2
 	constY            = 0
@@ -140,30 +140,55 @@ func generarEventos() {
 		enviarActualizacionTablero(tablero)
 
 		// Espera un tiempo antes de generar un nuevo movimiento
-		time.Sleep(150 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
 func generarTablero() [constCantFilasTablero][constCantColumnasTablero]string {
 	var tablero [constCantFilasTablero][constCantColumnasTablero]string
 
-	//PROGRAMAR
+	for x := 0; x < constCantColumnasTablero; x++ {
+		if x == 0 || x == 29 {
+			for y := 0; y < constCantFilasTablero; y++ {
+				tablero[y][x] = constSimboloBorde
+			}
+		}
+	}
+
+	for y := 0; y < constCantFilasTablero; y++ {
+		if y == 0 || y == 29 {
+			for x := 0; x < constCantColumnasTablero; x++ {
+				tablero[y][x] = constSimboloBorde
+			}
+		}
+	}
 
 	return tablero
 }
 
 func inicializarNave(cantFilasTablero int, cantColumnasTablero int) ([constCantColumnas]int, [constCantColumnas]int) {
-	//PROGRAMAR
+
+	var (
+		nave [constCantColumnas]int
+	)
+
+	nave[constY] = cantFilasTablero - 2
+	nave[constX] = cantColumnasTablero / 2
 
 	return [constCantColumnas]int{}, quieto
 }
 
 func inicializarOvnis(cantFilasTablero int, cantColumnasTablero int) [][constCantColumnasOvni]int {
 	var (
+		vec   [4]int
 		ovnis [][constCantColumnasOvni]int
 	)
 
-	//PROGRAMAR
+	vec[0] = 0
+	vec[1] = 4
+	vec[2] = 4
+	vec[3] = 0
+	ovnis = append(ovnis, vec)
 
 	return ovnis
 }
@@ -174,12 +199,24 @@ func actualizarTablero(tablero *[constCantFilasTablero][constCantColumnasTablero
 	ovnis [][constCantColumnasOvni]int,
 	disparosOvnis [][constCantColumnas]int) {
 
-	//PROGRAMAR
+	//bucle for para limpiar el tablero
+	for y := 1; y < constCantFilasTablero-1; y++ {
+		for x := 1; x < constCantColumnasTablero-1; x++ {
+			(*tablero)[y][x] = constSimboloVacío
+		}
+	}
+
+	//dibujar la nave
+
+	(*tablero)[nave[constOvniY]][nave[constX]] = constSimboloNave
+
+	//dibujar ovnis
+
 }
 
 func calcularNuevaPosicionNave(tablero [constCantFilasTablero][constCantColumnasTablero]string,
 	nave *[constCantColumnas]int, direccionNave *[constCantColumnas]int) {
-	//PROGRAMAR
+
 }
 
 func crearDisparoNave(nave [constCantColumnas]int,
@@ -208,8 +245,6 @@ func verificarEstadoDeJuego(tablero [constCantFilasTablero][constCantColumnasTab
 	disparosNave *[][constCantColumnasDisparos]int,
 	disparosOvnis *[][constCantColumnasDisparos]int,
 	puntos *int) bool {
-
-	//PROGRAMAR
 
 	return true
 }
