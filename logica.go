@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	constCantFilasTablero    = 25
-	constCantColumnasTablero = 29
+	constCantFilasTablero    = 30
+	constCantColumnasTablero = 30
 
 	constCantColumnas = 2
 	constY            = 0
@@ -140,79 +140,242 @@ func generarEventos() {
 		enviarActualizacionTablero(tablero)
 
 		// Espera un tiempo antes de generar un nuevo movimiento
-		time.Sleep(150 * time.Millisecond)
+		time.Sleep(85 * time.Millisecond)
 	}
 }
 
 func generarTablero() [constCantFilasTablero][constCantColumnasTablero]string {
 	var tablero [constCantFilasTablero][constCantColumnasTablero]string
 
+	for x := 0; x < constCantColumnasTablero; x++ {
+		if x == 0 || x == 29 {
+			for y := 0; y < constCantFilasTablero; y++ {
+				tablero[y][x] = constSimboloBorde
+			}
+		}
+	}
+
 	for y := 0; y < constCantFilasTablero; y++ {
-		if y == 0 || y == constCantFilasTablero-1 {
+		if y == 0 || y == 29 {
 			for x := 0; x < constCantColumnasTablero; x++ {
 				tablero[y][x] = constSimboloBorde
 			}
+		}
 	}
-	
+
 	return tablero
 }
 
 func inicializarNave(cantFilasTablero int, cantColumnasTablero int) ([constCantColumnas]int, [constCantColumnas]int) {
-	
-	//Programar
 
-	return [constCantColumnas]int{}, quieto
+	var (
+		nave [constCantColumnas]int
+	)
+
+	nave[constY] = cantFilasTablero - 4
+	nave[constX] = cantColumnasTablero / 2
+
+	return nave, quieto
 }
 
 func inicializarOvnis(cantFilasTablero int, cantColumnasTablero int) [][constCantColumnasOvni]int {
 	var (
+		vec   [4]int
 		ovnis [][constCantColumnasOvni]int
 	)
+	rand.Seed(time.Now().Unix())
+
+	for y := 2; y < cantFilasTablero-20; y++ {
+		for x := 5; x < cantColumnasTablero-5; x++ {
+
+			tipo := rand.Intn(2) + 1
+
+			vec[0] = tipo
+			vec[1] = y
+			vec[2] = x
+			vec[3] = 0
+
+			ovnis = append(ovnis, vec)
+
+		}
+	}
 
 	return ovnis
 }
+
 func actualizarTablero(tablero *[constCantFilasTablero][constCantColumnasTablero]string,
 	nave [constCantColumnas]int,
 	disparosNave [][constCantColumnas]int,
 	ovnis [][constCantColumnasOvni]int,
 	disparosOvnis [][constCantColumnas]int) {
 
-	//PROGRAMAR
+	//bucle for para limpiar el tablero
+	for y := 1; y < constCantFilasTablero-1; y++ {
+		for x := 1; x < constCantColumnasTablero-1; x++ {
+			tablero[y][x] = constSimboloVacío
+		}
+	}
+
+	//inicializar nave
+	tablero[nave[constY]][nave[constX]] = constSimboloNave
+
+	//inicio ovnis
+	for _, ovni := range ovnis {
+		var simbolo string
+		if ovni[constTipoOvni] == 1 {
+			simbolo = constSimboloOvniLider
+		} else {
+			simbolo = constSimboloOvniComun
+		}
+		tablero[ovni[constOvniY]][ovni[constOvniX]] = simbolo
+	}
+
+	for y := 0; y < len(disparosNave); y++ {
+		tablero[disparosNave[y][constY]][disparosNave[y][constX]] = constSimboloDisparoNave
+	}
+
+	for y := 0; y < len(disparosOvnis); y++ {
+		tablero[disparosOvnis[y][constY]][disparosOvnis[y][constX]] = constSimboloDisparoOvni
+	}
+
 }
 
 func calcularNuevaPosicionNave(tablero [constCantFilasTablero][constCantColumnasTablero]string,
 	nave *[constCantColumnas]int, direccionNave *[constCantColumnas]int) {
-	//PROGRAMAR
+
+	nuevaY := nave[constY] + direccionNave[constY]
+	nuevaX := nave[constX] + direccionNave[constX]
+
+	// Verifica que la nueva posición no sea un borde
+	if tablero[nuevaY][nuevaX] != constSimboloBorde {
+		nave[constY] = nuevaY
+		nave[constX] = nuevaX
+	}
 }
 
 func crearDisparoNave(nave [constCantColumnas]int,
 	disparoNave *bool,
 	disparosNave *[][constCantColumnasDisparos]int) {
 
-	//PROGRAMAR
+	if *disparoNave {
+		disparo := [constCantColumnasDisparos]int{
+			nave[constY] - 1, // Justo arriba de la nave
+			nave[constX],
+		}
+		*disparosNave = append(*disparosNave, disparo)
+		*disparoNave = false // Para evitar disparos continuos
+	}
+
 }
 
 func crearDisparoOvni(ovnis [][constCantColumnasOvni]int,
 	disparosOvnis *[][constCantColumnasDisparos]int) {
 
-	//PROGRAMAR
+	indice := rand.Intn(len(ovnis))
+	ovni := ovnis[indice]
+
+	disparo := [constCantColumnasDisparos]int{
+		ovni[constOvniY] + 1,
+		ovni[constOvniX],
+	}
+	*disparosOvnis = append(*disparosOvnis, disparo)
 }
 
 func calcularNuevasPosicionesDisparos(tablero [constCantFilasTablero][constCantColumnasTablero]string,
 	disparosNave [][constCantColumnasDisparos]int,
 	disparosOvnis [][constCantColumnasDisparos]int) {
 
-	//PROGRAMAR
+	for y := 0; y < len(disparosNave); y++ {
+		disparosNave[y][0] -= 1
+	}
+
+	for y := 0; y < len(disparosOvnis); y++ {
+		disparosOvnis[y][0] += 1
+	}
+
 }
 
-func verificarEstadoDeJuego(tablero [constCantFilasTablero][constCantColumnasTablero]string,
+func verificarEstadoDeJuego(
+	tablero [constCantFilasTablero][constCantColumnasTablero]string,
 	nave [constCantColumnas]int,
 	ovnis *[][constCantColumnasOvni]int,
 	disparosNave *[][constCantColumnasDisparos]int,
 	disparosOvnis *[][constCantColumnasDisparos]int,
-	puntos *int) bool {
+	puntos *int,
+) bool {
 
-	//PROGRAMAR
+	// 1. Disparos de la nave
+	for i := 0; i < len(*disparosNave); {
+		y := (*disparosNave)[i][constY]
+		x := (*disparosNave)[i][constX]
+
+		switch tablero[y][x] {
+		case constSimboloBorde:
+			// Toca borde, eliminar disparo
+			*disparosNave = eliminarDisparo(*disparosNave, y, x)
+		case constSimboloDisparoOvni:
+			// Toca disparo ovni, eliminar disparo nave
+			*disparosNave = eliminarDisparo(*disparosNave, y, x)
+		case constSimboloOvniComun:
+			// Toca ovni común no en descenso
+			for _, ovni := range *ovnis {
+				if ovni[constOvniY] == y && ovni[constOvniX] == x && ovni[constTipoOvni] == 2 && ovni[constEnDescenso] == 0 {
+					*disparosNave = eliminarDisparo(*disparosNave, y, x)
+					*ovnis = eliminarOvni(*ovnis, y, x)
+					*puntos += 10
+					break
+				}
+			}
+		case constSimboloOvniLider:
+			// Toca ovni líder no en descenso
+			for j, ovni := range *ovnis {
+				if ovni[constOvniY] == y && ovni[constOvniX] == x && ovni[constTipoOvni] == 1 && ovni[constEnDescenso] == 0 {
+					*disparosNave = eliminarDisparo(*disparosNave, y, x)
+					(*ovnis)[j][constTipoOvni] = 2 // Convertir a común
+					*puntos += 20
+					break
+				}
+			}
+		default:
+			i++
+		}
+	}
+
+	// 2. Disparos de ovni
+	for i := 0; i < len(*disparosOvnis); {
+		y := (*disparosOvnis)[i][constY]
+		x := (*disparosOvnis)[i][constX]
+
+		switch tablero[y][x] {
+		case constSimboloBorde:
+			// Toca borde, eliminar disparo ovni
+			*disparosOvnis = eliminarDisparo(*disparosOvnis, y, x)
+		case constSimboloDisparoNave:
+			// Toca disparo nave, eliminar disparo nave
+			*disparosNave = eliminarDisparo(*disparosNave, y, x)
+			i++
+		case constSimboloNave:
+			// Toca nave, pierde vida
+			return false
+		default:
+			i++
+		}
+	}
+
+	// 3. Ovni choca nave o borde
+	for i := 0; i < len(*ovnis); {
+		y := (*ovnis)[i][constOvniY]
+		x := (*ovnis)[i][constOvniX]
+
+		if tablero[y][x] == constSimboloNave {
+			*ovnis = eliminarOvni(*ovnis, y, x)
+			return false
+		} else if tablero[y][x] == constSimboloBorde {
+			*ovnis = eliminarOvni(*ovnis, y, x)
+		} else {
+			i++
+		}
+	}
 
 	return true
 }
@@ -240,9 +403,23 @@ func eliminarOvni(slice [][constCantColumnasOvni]int, coordenadaY int, coordenad
 }
 
 func liberarOvni(ovnis [][constCantColumnasOvni]int) {
-	//PROGRAMAR
+	indice := rand.Intn(len(ovnis))
+	ovnis[indice][constEnDescenso] = 1
+
 }
 
 func calcularNuevaPosicionOvnisLiberados(ovnis [][constCantColumnasOvni]int) {
-	//PROGRAMAR
+
+	for y := 0; y < len(ovnis); y++ {
+		if ovnis[y][3] == 1 {
+			ovnis[y][1] += 1
+
+			if ovnis[y][1] == 29 {
+
+				ovnis = eliminarOvni(ovnis, ovnis[y][1], ovnis[y][2])
+			}
+
+		}
+	}
+
 }
